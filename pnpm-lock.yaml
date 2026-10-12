@@ -75,6 +75,9 @@ importers:
       cn:
         specifier: ^0.4.0
         version: 0.4.0
+      cronstrue:
+        specifier: ^3.31.0
+        version: 3.31.0
       date-fns:
         specifier: ^4.4.0
         version: 4.4.0
@@ -1603,6 +1606,10 @@ packages:
   croner@9.0.0:
     resolution: {integrity: sha512-onMB0OkDjkXunhdW9htFjEhqrD54+M94i6ackoUkjHKbRnXdyEyKRelp4nJ1kAz32+s27jP1FsebpJCVl0BsvA==}
     engines: {node: '>=18.0'}
+
+  cronstrue@3.31.0:
+    resolution: {integrity: sha512-P+qVKwM6CHu6lWfQIq13DCBx95pxY/2zCQhIJvu5FsEsOlt9ZtuUI124V1LafoPsqHH09ruRsentTc4sbWxQHA==}
+    hasBin: true
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
@@ -3564,6 +3571,8 @@ snapshots:
   cookie@2.0.1: {}
 
   croner@9.0.0: {}
+
+  cronstrue@3.31.0: {}
 
   csstype@3.2.3: {}
 

@@ -20,6 +20,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { toast, Toaster } from 'sonner'
+import CronBuilder from '@/components/cron-builder'
 import { get, post, put, del, fmtTime, type JobInfo, type JobGroup, type PageResult, type Meta, type LogGlue } from '@/lib/api'
 import { Plus, Search, MoreHorizontal, Pencil, Trash2, Play, Square, Zap, FileCode2 } from 'lucide-react'
 
@@ -346,13 +347,21 @@ export default function Jobs() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 sm:col-span-2">
               <Label>{form.schedule_type === 'FIX_RATE' ? '频率（秒）' : 'Cron 表达式'}</Label>
-              <Input
-                value={form.schedule_conf}
-                onChange={(e) => setForm({ ...form, schedule_conf: e.target.value })}
-                placeholder={form.schedule_type === 'FIX_RATE' ? '60' : '0 * * * * ? *'}
-              />
+              {form.schedule_type === 'FIX_RATE' ? (
+                <Input
+                  type="number"
+                  value={form.schedule_conf}
+                  onChange={(e) => setForm({ ...form, schedule_conf: e.target.value })}
+                  placeholder="60"
+                />
+              ) : (
+                <CronBuilder
+                  value={form.schedule_conf}
+                  onChange={(v) => setForm({ ...form, schedule_conf: v })}
+                />
+              )}
               {nextTimes.length > 0 && (
                 <p className="text-xs text-muted-foreground">
                   近 3 次触发：{nextTimes.join(' / ')}

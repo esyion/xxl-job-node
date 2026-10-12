@@ -1,6 +1,13 @@
 # XXL-JOB Node
 
-参考 [xxl-job](https://github.com/xuxueli/xxl-job) 3.5.x 架构复刻的 **Node.js / TypeScript** 分布式任务调度平台。调度模型、通信协议、数据库表结构与 Java 版对齐（部分端点语义一致），执行层替换为 Node 异步模型。
+[![Node.js >= 20](https://img.shields.io/badge/node-%3E%3D20-green)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![React](https://img.shields.io/badge/UI-React%20%2B%20shadcn%2Fui-purple)](https://ui.shadcn.com)
+
+参考 [xxl-job](https://github.com/xuxueli/xxl-job) 3.5.x 架构复刻的 **Node.js / TypeScript** 分布式任务调度平台。调度模型、通信协议、数据库表结构与 Java 版对齐（部分端点语义一致），执行层替换为 Node 异步模型，并针对 Node 特性做了增强（worker_threads 真强杀、AsyncLocalStorage 上下文）。
+
+> 纯 TypeScript 实现，无一行 JavaScript；执行器 SDK 零运行时依赖。
 
 ## 架构
 
@@ -26,11 +33,21 @@
 
 | 包 | 说明 |
 |---|---|
-| `packages/core` | 执行器 SDK：`JobExecutor` + `@XxlJob` 装饰器 + `XxlJobHelper` 静态 API |
-| `packages/admin` | 调度中心：调度内核 + 触发链路 + Fastify REST |
-| `packages/web` | 控制台：Vite + React + TS + shadcn/ui（46 个组件全量安装） |
-| `packages/samples` | 无框架接入示例 |
+| `packages/core` | 执行器 SDK：`JobExecutor` + `@XxlJob` 装饰器 + `XxlJobHelper` 静态 API + worker_threads 池 |
+| `packages/admin` | 调度中心：调度内核 + 触发链路 + Fastify REST + 用户/权限 + 邮件告警 |
+| `packages/web` | 控制台：Vite + React + TS + shadcn/ui（46 个组件全量安装），含 Cron 可视化构建器 |
+| `packages/samples` | 无框架接入示例（装饰器 / 函数式 / worker 三种注册） |
 | `doc/db` | 数据库初始化脚本（兼容 xxl-job 3.5.x 表结构） |
+| `docker/` | admin / web 镜像构建文件与 nginx 配置 |
+
+## 功能总览
+
+- **调度**：CRON（含可视化构建器）/ 固定频率、misfire 补偿、集群行锁互斥、60 槽时间轮秒级准点
+- **路由**：10 种策略（首个/轮询/随机/一致性哈希/LFU/LRU/故障转移/忙碌转移/分片广播…）
+- **执行**：串行队列 + 三种阻塞策略、超时控制、worker_threads 隔离 CPU 密集任务（可真强杀）
+- **任务类型**：BEAN（进程内函数）、GLUE 脚本（Shell/Python/Nodejs/PowerShell，在线编辑 + 版本回滚 + 运行中热更）
+- **可靠性**：回调批量上报 + 失败落盘重试、结果丢失兜底、失败重试、CAS 告警去重（邮件/控制台）
+- **管控**：用户管理与执行器组级数据权限、第三方 OpenAPI 六接口（令牌桶限流）、运行报表、日志滚动查看与终止
 
 ## 快速开始
 
@@ -192,3 +209,17 @@ MySQL 首次启动自动执行 `doc/db/tables_xxl_job.sql`；web（nginx :5173�
 ## License
 
 MIT
+
+## 致谢
+
+- **[xxl-job](https://github.com/xuxueli/xxl-job)**（许雪里）—— 本项目的架构蓝本。行锁调度 + 时间轮、触发-回调状态机、路由策略、注册发现等核心设计均来自对 xxl-job 3.5.x 源码的研读与复刻，数据库表结构与之兼容。强烈推荐阅读原项目。
+- **[croner](https://github.com/hexagon/croner)** —— 零依赖的 cron 解析与下次触发计算。
+- **[cronstrue](https://github.com/bradymiller/cronstrue)** —— Cron 表达式的中文自然语言翻译。
+- **[shadcn/ui](https://ui.shadcn.com)** —— 控制台全部 UI 组件体系。
+- **[Fastify](https://fastify.dev)** / **[mysql2](https://github.com/sidorares/node-mysql2)** / **[nodemailer](https://nodemailer.com)** / **[Vite](https://vite.dev)** / **[tsx](https://tsx.is)** —— 调度中心与工程化的基础。
+
+本项目为学习研究 xxl-job 设计思想的独立实现（TypeScript / Node.js 原创代码），未包含原项目源码。
+
+## License
+
+[MIT](./LICENSE) © esyion

@@ -15,6 +15,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "cn": "^0.4.0",
+    "cronstrue": "^3.31.0",
     "date-fns": "^4.4.0",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.5.0",

@@ -16,8 +16,20 @@ export function generateNextTriggerTime(job: XxlJobInfo, fromTime: Date): number
   return null;
 }
 
+/**
+ * Quartz 7 域（含年）与 `?` 通配归一化为 croner 兼容的 6 域。
+ * xxl-job 标准 cron 为 7 域（秒 分 时 日 月 周 年），croner 只认 5/6 域且不支持 `?`；
+ * 年位仅作兼容丢弃，`?` 按 Quartz 语义视作 `*`（另一侧的具体值仍生效）。
+ */
+export function normalizeCron(cron: string): string {
+  const parts = cron.trim().replace(/\s+/g, ' ').split(' ');
+  const six = parts.length === 7 ? parts.slice(0, 6) : parts;
+  return six.map((p) => (p === '?' ? '*' : p)).join(' ');
+}
+
 export function nextByCron(cron: string, fromTime: Date): number | null {
-  const conf = cron.trim().replace(/\s+/g, ' ');
+  const conf = normalizeCron(cron);
+  if (!conf) return null;
   try {
     const instance = new Cron(conf);
     const next = instance.nextRun(fromTime);
@@ -40,7 +52,7 @@ export function validateScheduleConf(type: string, conf: string): string | null 
   if (type === 'CRON') {
     if (!conf) return '请输入 Cron 表达式';
     try {
-      new Cron(conf.trim());
+      new Cron(normalizeCron(conf));
       return null;
     } catch {
       return 'Cron 表达式不合法';
