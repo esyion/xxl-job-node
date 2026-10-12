@@ -1,0 +1,22 @@
+{
+  "name": "xxl-job-node",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A distributed task scheduling framework - Node.js port of xxl-job 3.5.x",
+  "license": "MIT",
+  "packageManager": "pnpm@11.18.0",
+  "scripts": {
+    "build": "tsc -b packages/core packages/admin packages/samples",
+    "typecheck": "tsc -b packages/core packages/admin packages/samples",
+    "dev:admin": "pnpm --filter @xxl-job-node/admin dev",
+    "dev:sample": "pnpm --filter @xxl-job-node/sample-frameless dev",
+    "dev:web": "pnpm --filter @xxl-job-node/web dev"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "~6.0.3"
+  }
+}

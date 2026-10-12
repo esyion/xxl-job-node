@@ -1,0 +1,15 @@
+{
+  "name": "@xxl-job-node/core",
+  "version": "1.0.0",
+  "description": "xxl-job-node executor SDK: embedded server, job queue, registry & callback",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

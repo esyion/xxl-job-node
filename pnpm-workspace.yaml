@@ -1,0 +1,8 @@
+packages:
+  - packages/*
+
+# 允许运行 install 脚本的原生依赖（pnpm 11 安全默认拦截，需显式批准）
+allowBuilds:
+  esbuild: true
+  "@tailwindcss/oxide": true
+  unrs-resolver: true

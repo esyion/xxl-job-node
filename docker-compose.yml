@@ -1,0 +1,62 @@
+# 一键启动：docker compose up -d --build
+# 含可选的示例执行器：docker compose --profile sample up -d --build
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: xxljob
+      MYSQL_DATABASE: xxl_job
+    volumes:
+      # 首次启动自动执行建表脚本
+      - ./doc/db:/docker-entrypoint-initdb.d:ro
+      - mysql-data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      # 供宿主机本地开发连接（pnpm dev:admin）；不需要可删除
+      - "127.0.0.1:3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-pxxljob"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  admin:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.admin
+    environment:
+      XXL_JOB_DB_HOST: mysql
+      XXL_JOB_DB_PORT: "3306"
+      XXL_JOB_DB_USER: root
+      XXL_JOB_DB_PASSWORD: xxljob
+      XXL_JOB_DB_NAME: xxl_job
+      XXL_JOB_ADMIN_PORT: "8989"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8989:8989"
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    depends_on:
+      - admin
+    ports:
+      - "5173:80"
+
+  sample-executor:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.admin # 同构镜像（tsx 运行 TS），入口改为示例执行器
+    working_dir: /app/packages/samples
+    command: ["pnpm", "start"]
+    environment:
+      XXL_JOB_ADMIN_ADDRESSES: http://admin:8989
+      XXL_JOB_APPNAME: xxl-job-node-sample
+      XXL_JOB_ACCESS_TOKEN: default_token
+    profiles: ["sample"]
+
+volumes:
+  mysql-data:
